@@ -40,7 +40,7 @@ class EstudianteGetId(Resource):
     def get(self, idestudiante):
         response = estudiantes.Estudiantes.get_estudiante_id(idestudiante)
         if not response:
-            return {"message": "Estudiante no encontrado"}, 404
+            return {"message": "Inscripción no encontrada"}, 404
         return response[0], 200
 
     def delete(self, idestudiante):
