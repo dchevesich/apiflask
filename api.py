@@ -13,6 +13,14 @@ except Exception as error:
     print(f"Error cargando namespace de estudiantes: {error}")
     raise
 
+try:
+    incripciones_module = importlib.import_module(
+        "nspace.incripciones.inscripciones")
+    api.add_namespace(incripciones_module.name_space)
+except Exception as error:
+    print(f"Error cargando namespace de inscripciones: {error}")
+    raise
+
 
 if __name__ == "__main__":
     app.run(debug=True)
