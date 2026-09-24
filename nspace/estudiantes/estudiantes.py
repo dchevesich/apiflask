@@ -1,9 +1,16 @@
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required
 from models.estudiantes import estudiantes
 
 
 name_space = Namespace(
     "estudiantes", description="Clase para manejo de estudiantes")
+
+estudiante_model = name_space.model("Estudiante", {
+    "nombre": fields.String(required=True, description="Nombre del estudiante"),
+    "email": fields.String(required=True, description="Correo del estudiante"),
+    "telefono": fields.String(description="Teléfono del estudiante"),
+})
 
 
 @name_space.route("/")
@@ -11,9 +18,12 @@ class EstudianteGet(Resource):
     def get(self):
         response = estudiantes.Estudiantes.get_estudiante()
         if not response:
-            return [], 200
+            return {"message": "Estudiante no encontrado"}, 404
         return response, 200
 
+    @name_space.expect(estudiante_model, validate=True)
+    @name_space.doc(security="Bearer")
+    @jwt_required()
     def post(self):
         data = name_space.payload or {}
 
@@ -40,9 +50,11 @@ class EstudianteGetId(Resource):
     def get(self, idestudiante):
         response = estudiantes.Estudiantes.get_estudiante_id(idestudiante)
         if not response:
-            return {"message": "Inscripción no encontrada"}, 404
+            return {"message": "Estudiante no encontrado con id solicitado."}, 404
         return response[0], 200
 
+    @name_space.doc(security="Bearer")
+    @jwt_required()
     def delete(self, idestudiante):
         response = estudiantes.Estudiantes.delete_estudiantes(idestudiante)
         if not response:
@@ -50,6 +62,9 @@ class EstudianteGetId(Resource):
         return {
             "message": "Estudiante eliminado."}, 200
 
+    @name_space.expect(estudiante_model, validate=True)
+    @name_space.doc(security="Bearer")
+    @jwt_required()
     def put(self, idestudiante):
         data = name_space.payload or {}
 
